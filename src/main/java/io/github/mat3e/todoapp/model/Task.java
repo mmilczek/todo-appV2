@@ -1,6 +1,7 @@
 package io.github.mat3e.todoapp.model;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import io.github.mat3e.todoapp.model.event.TaskEvent;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
@@ -65,8 +66,9 @@ public class Task {
         return done;
     }
 
-    public void setDone(boolean done) {
-        this.done = done;
+    public TaskEvent toggle() {
+        this.done = !this.done;
+        return TaskEvent.changed(this);
     }
 
     public LocalDateTime getDeadline() {

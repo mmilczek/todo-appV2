@@ -6,8 +6,6 @@ import io.github.mat3e.todoapp.model.TaskGroupRepository;
 import io.github.mat3e.todoapp.model.TaskRepository;
 import io.github.mat3e.todoapp.model.projection.GroupReadModel;
 import io.github.mat3e.todoapp.model.projection.GroupWriteModel;
-import org.springframework.stereotype.Service;
-import org.springframework.web.context.annotation.RequestScope;
 
 import java.util.List;
 import java.util.stream.Collectors;

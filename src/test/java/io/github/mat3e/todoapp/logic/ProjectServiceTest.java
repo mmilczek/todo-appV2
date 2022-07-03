@@ -13,7 +13,8 @@ import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.catchThrowable;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -31,7 +32,7 @@ class ProjectServiceTest {
         ProjectService toTest = new ProjectService(null, mockGroupRepository, null, mockConfig);
 
         //when
-        Throwable exception = catchThrowable(() -> toTest.createGroup(LocalDateTime.now(),0));
+        Throwable exception = catchThrowable(() -> toTest.createGroup(LocalDateTime.now(), 0));
 
         // then
         assertThat(exception)
@@ -40,18 +41,18 @@ class ProjectServiceTest {
     }
 
     @Test
-    @DisplayName("should throw IllegalArgumentException when configuration ok and no projects for given id")
+    @DisplayName("should throw IllegalArgumentException when configuration ok and no projects for a given id")
     void createGroup_configurationOk_And_noProjects_throwsIllegalArgumentException() {
         //given
         ProjectRepository mockRepository = mock(ProjectRepository.class);
         when(mockRepository.findById(anyInt())).thenReturn(Optional.empty());
 
-        TaskConfigurationProperties mockConfig = configurationReturning(false);
+        TaskConfigurationProperties mockConfig = configurationReturning(true);
 
         ProjectService toTest = new ProjectService(mockRepository, null, null, mockConfig);
 
         //when
-        Exception exception = (Exception) catchThrowable(() -> toTest.createGroup(LocalDateTime.now(),0));
+        Exception exception = (Exception) catchThrowable(() -> toTest.createGroup(LocalDateTime.now(), 0));
 
         // then
         assertThat(exception)
@@ -76,7 +77,7 @@ class ProjectServiceTest {
         ProjectService toTest = new ProjectService(mockRepository, mockGroupRepository, null, mockConfig);
 
         //when
-        Exception exception = (Exception) catchThrowable(() -> toTest.createGroup(LocalDateTime.now(),0));
+        Exception exception = (Exception) catchThrowable(() -> toTest.createGroup(LocalDateTime.now(), 0));
 
         // then
         assertThat(exception)
@@ -147,25 +148,25 @@ class ProjectServiceTest {
 
     private static class InMemoryGroupRepository implements TaskGroupRepository {
 
-            private int index = 0;
-            private Map<Integer, TaskGroup> map = new HashMap<>();
+        private int index = 0;
+        private Map<Integer, TaskGroup> map = new HashMap<>();
 
-            public int count() {
-                return map.values().size();
-            }
+        public int count() {
+            return map.values().size();
+        }
 
-            @Override
-            public List<TaskGroup> findAll() {
+        @Override
+        public List<TaskGroup> findAll() {
             return new ArrayList<>(map.values());
         }
 
-            @Override
-            public Optional<TaskGroup> findById(Integer id) {
+        @Override
+        public Optional<TaskGroup> findById(Integer id) {
             return Optional.ofNullable(map.get(id));
         }
 
-            @Override
-            public TaskGroup save(final TaskGroup entity) {
+        @Override
+        public TaskGroup save(final TaskGroup entity) {
             if (entity.getId() == 0) {
                 try {
                     Field field = TaskGroup.class.getDeclaredField("id");
@@ -179,11 +180,17 @@ class ProjectServiceTest {
             return entity;
         }
 
-            @Override
-            public boolean existsByDoneIsFalseAndProject_Id(Integer projectId) {
+        @Override
+        public boolean existsByDoneIsFalseAndProject_Id(Integer projectId) {
             return map.values().stream()
                     .filter(group -> !group.isDone())
                     .anyMatch(group -> group.getProject() != null && group.getProject().getId() == projectId);
+        }
+
+        @Override
+        public boolean existsByDescription(String description) {
+            return map.values().stream()
+                    .anyMatch(group -> group.getDescription().equals(description));
         }
     }
 
@@ -200,5 +207,5 @@ class ProjectServiceTest {
         TaskGroupRepository mockGroupRepository = mock(TaskGroupRepository.class);
         when(mockGroupRepository.existsByDoneIsFalseAndProject_Id(anyInt())).thenReturn(result);
         return mockGroupRepository;
-     }
+    }
 }
