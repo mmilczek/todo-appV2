@@ -34,7 +34,6 @@
 <body>
 <main>
     <h1 th:if="${message != null}" th:text="${message}"></h1>
-    <!--/*@thymesVar id="groups" type="java.util.List<io.github.mat3e.todoapp.model.projection.GroupReadModel>"*/-->
     <dl th:each="group : ${groups}" class="Bd P(10px)">
         <dt>
             <label>
@@ -45,27 +44,24 @@
             <hr class="M(0)"/>
         </dt>
         <dd>
-            <!--/*@thymesVar id="group" type="io.github.mat3e.todoapp.model.projection.GroupWriteModel"*/-->
             <a th:href="@{/tasks.html(group=${group.id})}">
                 <ul class="P(0)">
-                    <li th:each="task : ${group.tasks}"></li>
+                    <li th:each="task : ${group.tasks}">
                     <span th:unless="${task.done}" th:text="${task.description}"></span>
-                    <!--/*@thymesVar id="task" type="io.github.mat3e.todoapp.model.projection.GroupTaskWriteModel"*/-->
                     <del th:if="${task.done}" th:text="${task.description}"></del>
+                    </li>
                 </ul>
             </a>
         </dd>
     </dl>
     <legend>Nowa grupa</legend>
-    <!--/*@thymesVar id="group" type="io.github.mat3e.todoapp.model.projection.GroupWriteModel"*/-->
-    <!--/*@thymesVar id="groups" type="java.util.List<io.github.mat3e.todoapp.model.projection.GroupReadModel>"*/-->
     <fieldset>
         <form action="#" method="post" th:action="@{/groups}" th:object="${group}">
             <p class="C(red)" th:if="${#fields.hasAnyErrors()}" th:errors="*{all}"></p>
             <label>Opis
                 <input type="text" th:field="*{description}" th:errorclass="'Bdc(red)'"/>
             </label>
-            <fieldset th:each="task,taskStat : *{group.getTasks()}">
+            <fieldset th:each="task,taskStat : *{tasks}">
                 <legend th:text="|Zadanie ${taskStat.index + 1}|"></legend>
                 <label>Opis
                     <input type="text" th:field="*{tasks[__${taskStat.index}__].description}"
